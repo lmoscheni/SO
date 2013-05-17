@@ -1,7 +1,19 @@
 SO
 ==
 
-Emulador de SO
+Emulator S.O
 
-En este repositorio se iran cargando y actualizando los componentes del emeulador del SO.
-La idea es que cualquier correccion/sugerencia sea modificada y actualizada por aca.
+In this repository you will go up and updating the different components of the operating system emulator. 
+It is the idea that any questions or suggestions, both design and the code, is reported by here.
+
+So far they have been uploaded the following components:
+
+* Shell
+* Program
+* The Hierarchy of instructions
+* The User Hierarchy
+* Command Line Interface (CLI)
+* Clock
+* Timmer
+* CPU
+* Primary Memory
