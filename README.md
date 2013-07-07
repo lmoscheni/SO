@@ -14,3 +14,5 @@ Por ahora los modulos cargados, son los siguientes:
 * User(Gerarquia)
 * CPU(incluye Timmer y Clock)
 * InterruptionHandler
+* Scheduler
+* Kernel
