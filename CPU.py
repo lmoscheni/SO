@@ -11,27 +11,25 @@ class CPU(threading.Thread):
         Entidad fisica encargada de correr las intrucciones, y computar
         intrucciones de calculo y logica.
     '''
-    def __init__(self,memory,kernel,quantum):
-        self.currentProces = None
+    def __init__(self,memory,kernel,quantum,intrHandler):
+        self.currentProcess = None
         self.end = False
         self.kernel = kernel
         self.memory = memory
         self.clock = Clock(1)
         self.timmer = Timmer(quantum)
+        self.interruptionHandler = intrHandler
         self.run()
         
     def shutDown(self):
         self.end = True
         
-    def loadProces(self,proces):
+    def loadProcess(self,process):
         self.timmer.reset()
-        self.currentProces = proces
+        self.currentProcess = process
         
     def changeKernelMode(self):
         self.sleep(3)
-        
-    def getCurrentProces(self):
-        return self.currentProces
     
     def isTimeOut(self):
         return self.timmer.isTheLimitOfCycles()
@@ -40,15 +38,15 @@ class CPU(threading.Thread):
         return self.currentProces.reachedTheEnd()
         
     def runIntruction(self):
-        self.memory.get(self.currentProces.getPC()).runInstruction()
-        self.currentProces.increasePC()
+        self.memory.get(self.currentProcess.getPC()).runInstruction()
+        self.currentProcess.increasePC()
         self.timmer.addCylce()
 
     def run(self):
         while True:
             self.runIntruction()
-            if self.isTimeOut(): self.loadProces(self.kernel.getProces())
-            if self.isEndProgram(): print "" # mandarInterrupcion
+            if self.isTimeOut(): self.interruptionHandler.notifyTheKernelOfTheContextSwitching()
+            if self.isEndProgram(): self.interruptionHandler.notifyTheKernelOfTerminationOfProcess()
             if self.end: break
             
         

@@ -3,17 +3,14 @@ SO
 
 Emulator S.O
 
-In this repository you will go up and updating the different components of the operating system emulator. 
-It is the idea that any questions or suggestions, both design and the code, is reported by here.
+Con el fin de poner en practica los conceptos teoricos aprendidos en la materia,
+se da a lugar al desarrollo de un pequeño emulador de un SO.
 
-So far they have been uploaded the following components:
+Por ahora los modulos cargados, son los siguientes:
 
 * Shell
 * Program
-* The Hierarchy of instructions
-* The User Hierarchy
-* Command Line Interface (CLI)
-* Clock
-* Timmer
-* CPU
-* Primary Memory
+* Instructions(Gerarquia)
+* User(Gerarquia)
+* CPU(incluye Timmer y Clock)
+* InterruptionHandler
