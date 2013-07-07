@@ -34,7 +34,6 @@ def generateTokens(ent):
 class Shell():
     def __init__(self, password):
         self.users = []
-        self.kernel = Kernel()
         self.users.append(AdministratorUser("Root",password))
         self.currentUser = None
         self.initializePrompt()
