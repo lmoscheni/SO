@@ -51,12 +51,3 @@ class Bloque():
             retorno = True
         return retorno
 
-class BloqueLibre(Bloque):
-    def __init__(self,registroBase,registroLimite,instr):
-        Bloque.__init__(self,registroBase,registroLimite,instr,True)
-
-
-
-class BloqueOcupado(Bloque):
-    def __init__(self,registroBase,registroLimite,instr,proxBloque):
-        Bloque.__init__(self,registroBase,registroLimite,instr,proxBloque,False)
