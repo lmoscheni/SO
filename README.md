@@ -16,3 +16,6 @@ Por ahora los modulos cargados, son los siguientes:
 * InterruptionHandler
 * Scheduler
 * Kernel
+* PCB
+* Queue y Dictionary
+* HardDisk

@@ -17,7 +17,7 @@ class Kernel(threading.Thread):
     def __init__(self,memory,cpu,hd,intrHandler):
         self.memory = memory
         self.CPU = cpu
-        self.hd = hd
+        self.hdd = hd
         self.interruptionHandler = intrHandler
         self.schedulerPolicy = None
         self.readyQueue = Queue()
@@ -25,7 +25,7 @@ class Kernel(threading.Thread):
         
     def createProcess(self,program):
         self.interruptionHandler.changeToKernelMode()
-        process = self.hd.search(program)
+        process = self.hdd.search(program)
         result = self.memory.load(process)
         pcb = PCB(self.nextPID,result.getPC(),result.getFin())
         self.increaseNextPID()
