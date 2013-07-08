@@ -14,10 +14,10 @@ class Kernel(threading.Thread):
         Es la entidad encargada de crear procesos, e interactuar
         con el hardware.
     '''
-    def __init__(self,memory,cpu,disco,intrHandler):
+    def __init__(self,memory,cpu,hd,intrHandler):
         self.memory = memory
         self.CPU = cpu
-        self.disco = disco
+        self.hd = hd
         self.interruptionHandler = intrHandler
         self.schedulerPolicy = None
         self.readyQueue = Queue()
@@ -25,7 +25,7 @@ class Kernel(threading.Thread):
         
     def createProcess(self,program):
         self.interruptionHandler.changeToKernelMode()
-        process = self.disco.search(program)
+        process = self.hd.search(program)
         result = self.memory.load(process)
         pcb = PCB(self.nextPID,result.getPC(),result.getFin())
         self.increaseNextPID()
