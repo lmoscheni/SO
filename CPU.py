@@ -1,7 +1,7 @@
 '''
 Created on Jul 7, 2013
 
-@author: Leandro Moscheni ; Julia Skalic
+@author: Leandro Moscheni ; Julian Skalic
 '''
 import threading
 import time
@@ -11,11 +11,9 @@ class CPU(threading.Thread):
         Entidad fisica encargada de correr las intrucciones, y computar
         intrucciones de calculo y logica.
     '''
-    def __init__(self,memory,kernel,quantum,intrHandler):
+    def __init__(self,quantum,intrHandler):
         self.currentProcess = None
         self.end = False
-        self.kernel = kernel
-        self.memory = memory
         self.clock = Clock(1)
         self.timmer = Timmer(quantum)
         self.interruptionHandler = intrHandler
@@ -27,9 +25,6 @@ class CPU(threading.Thread):
     def loadProcess(self,process):
         self.timmer.reset()
         self.currentProcess = process
-        
-    def changeKernelMode(self):
-        self.sleep(3)
     
     def isTimeOut(self):
         return self.timmer.isTheLimitOfCycles()
