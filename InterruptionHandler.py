@@ -10,19 +10,23 @@ class InterruptionHandler():
         del Sistema, y hace interactuar a los participes entre dichas
         interrupciones.
     '''
-    def __init__(self,ioSys,memory,pageTable):
+    def __init__(self,ioSys,memory,pageTable,shell):
         self.CPU = None
         self.kernel = None
         self.ioSystem = ioSys
         self.memory = memory
         self.pageTable = pageTable
+        self.shell = shell
 
     # Cambia al modo Kernel
     def changeToKernelMode(self):
-        print ""
+        self.kernel.run()
+        self.CPU.wait()
 
+    # Cambia al modo Normal de ejecucion
     def changeToNormalMode(self):
-        print ""
+        self.kernel.wait()
+        self.CPU.run()
 
     def setKernel(self,kernel):
         self.kernel = kernel
@@ -38,20 +42,22 @@ class InterruptionHandler():
     # quite de la cola de Ready
     def notifyTheKernelOfTerminationOfProcess(self,pcb):
         self.requestToFreeMemorySpace(pcb)
+        self.changeToKernelMode()
         self.kernel.deleteProcess(pcb)
         self.notifyTheKernelOfContextSwitching()
 
     # Notifica al Kernel, de un cambio de contexto, para que este,actue
     # en consecuencia
     def notifyTheKernelOfContextSwitching(self):
-        self.kernel.nextProcess()
-
+        pcb = self.kernel.nextProcess()
+        self.changeToNormalMode()
+        self.requestLoadProcesOnCPU(pcb)
+        
     # El Shell pide al Kernel, la creacion de un proceso, referente a un
     # programa alojado en disco.
     def askTheKernelToCreateProcess(self,nameProgram):
-        program = self.requestTheProgramDisk(nameProgram)
-        pcb = self.requestMemorySpaceToLoadData(program)
-        self.kernel.addProcess(pcb)
+        self.kernel.createProcess(nameProgram)
+        self.changeToNormalMode()
 
     # El kernel pide a memoria principal, espacio para cargar a un programa,
     # de haber espacio, se pasa a la carga del programa en memoria, caso
@@ -92,3 +98,13 @@ class InterruptionHandler():
     #Retorna un nuevo proceso que se cargo en memoria y en la tabla
     def requestNewProcessFromPageTable(self,pid):
         return self.pageTable.getPCB(pid)
+
+    # Se utiliza cuando el Kernel quiere notificar de algun suceso al usuario.
+    def sendShellMessage(self,msj):
+        self.shell.showMessageInDisplay(msj)
+        
+    # Se utiliza para pedir un proceso en caso de que no haya ninguno en CPU    
+    def getProcess(self):
+        self.changeToKernelMode()
+        pcb = self.kernel.nextProcess()
+        self.requestLoadProcesOnCPU(pcb)

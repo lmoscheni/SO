@@ -290,38 +290,3 @@ class WorstFit(LoadStrategy):
         if (baseRegister + registerInstruction) <= limitRegister: memory.getFreeMemory()[loadABlock].setBaseRegister(memory.getFreeMemory()[loadABlock].getBaseRegister()+registerInstruction)
         else: self.removeBlock(memory,memory.getFreeMemory()[loadABlock])
         return ret
-
-
-class Paginacion():
-
-    def createPaginationMemory(self,memory):
-        memory.resetFreeMemory()
-        numberBlock = 0
-        for block in memory.getFreeMemory():
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

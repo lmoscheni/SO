@@ -18,6 +18,9 @@ class Queue():
 
     def remove(self,element):
         self.queue.remove(element)
+    
+    def dequeue(self):
+        self.remove(self.first())
 
     def first(self):
         return self.queue[0]

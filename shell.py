@@ -34,11 +34,12 @@ def generateTokens(ent):
 
 # Representacion de un Shell
 class Shell():
-    def __init__(self, password):
+    def __init__(self, password,intrHandler):
         self.users = []
-        self.kernel = Kernel()
+        self.interruptionHandler = intrHandler
         self.users.append(AdministratorUser("Root",password))
         self.currentUser = None
+        self.notification = ""
         self.initializePrompt()
     
     def initializePrompt(self):
@@ -52,6 +53,7 @@ class Shell():
         self.loggin(name,password)
         while True:
             print self.currentUser.getName() , statePrompt
+            if self.notification != "": print self.notification
             input = raw_input()
             if(input == "exit"): break
             tokens = generateTokens(input)
@@ -60,7 +62,8 @@ class Shell():
             if(tokens[0] == "addUser"): self.addUser(tokens[1], tokens[2])
             if(tokens[0] == "whoIm"): self.whoIm()
             if(tokens[0] == "setAsAdmin") : self.setAsAdmin(tokens[1])
-            #Hay que hacer que interactue con el Kernel, para buscar el programa en Disco
+            self.runCommand(tokens[0])
+            
 
     # Nos permite iniciar sesion en el shell.
     def loggin(self,user,password):
@@ -99,3 +102,11 @@ class Shell():
                 new = AdministratorUser(u.getName(),u.getPassword())
                 this.users.remove(u)
                 this.users.append(new)
+    
+    # Permite ejecutar un programa alojado en disco            
+    def runCommand(self,anCommand):
+        self.interruptionHandler.askTheKernelToCreateProcess(anCommand)
+
+    # Permite mostrar texto en la consola, basicamente para notificacione de errores, etc
+    def showMessageInTheDisplay(self,msj):
+        self.notification = msj

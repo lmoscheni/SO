@@ -21,31 +21,27 @@ class Kernel(threading.Thread):
         self.schedulerPolicy = FIFO()
         self.readyQueue = Queue()
         self.nextPID = 0
+        
+    def searchProgramInDiskAndLoadInMemory(self,nameProgram):
+        program = self.interruptionHandler.requestTheProgramDisk(program)
+        self.interruptionHandler.requestMemorySpaceToLoadData(program,self.nextPID)
+        pcb = self.interruptionHandler.requestNewProcessFromPageTable(self.nextPID)
+        self.increaseNextPID()
+        return pcb
 
-    def createProcess(self,program):
+    def createProcess(self,nameProgram):
         try:
             self.interruptionHandler.changeToKernelMode()
-            program = self.interruptionHandler.requestTheProgramDisk(program)
-            self.interruptionHandler.requestMemorySpaceToLoadData(program,self.nextPID)
-            pcb = self.interruptionHandler.requestNewProcessFromPageTable(self.nextPID)
-            if self.readyQueue.isEmpty() & (not self.interruptionHandler.requestRunningProcessOnCPU()): self.interruptionHandler.requestLoadProcesOnCPU(pcb)
-            else: self.readyQueue.add(pcb)
-            self.increaseNextPID()
+            pcb = self.searchProgramInDiskAndLoadInMemory(nameProgram)
+            self.readyQueue.add(pcb)
         except (ExceptionNoProgramInDisk,ExceptionNoMemory), e:
-            print e
+            self.interruptionHandler.sendShellMessage(e)
 
     def increaseNextPID(self):
         self.nextPID = self.nextPID + 1
 
-    def deleteProcess(self,p):
-        self.interruptionHandler.requestToFreeMemorySpace(p)
-        if (not self.readyQueue.isEmpty()):
-            retorno = self.schedulerPolicy.getProcess(self.readyQueue)
-            self.readyQueue.remove(retorno)
-            self.interruptionHandler.requestLoadProcesOnCPU(retorno)
-        else:
-            self.interruptionHandler.requestLoadProcesOnCPU(None)
-            #self.interruptionHandler.shutDownPC()
+    def deleteProcess(self,process):
+        self.readyQueue.remove(process)
 
     def FIFOPolicy(self):
         self.schedulerPolicy = FIFO()
@@ -57,8 +53,7 @@ class Kernel(threading.Thread):
         self.schedulerPolicy = Priority()
 
     def nextProcess(self):
-        CPUProcess = self.interruptionHandler.getCurrentProcessOnCPU()
-        self.readyQueue.add(CPUProcess)
-        retorno = self.schedulerPolicy.getProcess(self.readyQueue)
-        self.readyQueue.remove(retorno)
-        self.interruptionHandler.requestLoadProcesOnCPU(retorno)
+        if self.readyQueue.isEmpty():
+            return None
+        else:
+            return self.schedulerPolicy.getProcess(self.readyQueue)

@@ -31,6 +31,7 @@ class CPU(threading.Thread):
     def loadProcess(self,process):
         self.timmer.reset()
         self.currentProcess = process
+        process.setState("Running")
 
     def currentProcessRunning(self):
         return (self.currentProcess != None)
@@ -50,13 +51,17 @@ class CPU(threading.Thread):
         self.currentProcess.increasePC()
         self.timmer.addCylce()
 
+    def checkStatusOfCurrentProcess(self):
+        if self.isEndProgram() :return self.interruptionHandler.notifyTheKernelOfTerminationOfProcess(self.currentProcess)
+        if self.isTimeOut() : return self.interruptionHandler.notifyTheKernelOfContextSwitching()
+
     def run(self):
         while True:
             if self.currentProcess != None:
                 self.runIntruction()
-                if self.isEndProgram(): self.interruptionHandler.notifyTheKernelOfTerminationOfProcess(self.currentProcess)
-                else:
-                    if self.isTimeOut(): self.interruptionHandler.notifyTheKernelOfContextSwitching()
+                self.checkStatusOfCurrentProcess()
+            else:
+                self.interruptionHandler.getProcess()
             if self.end: break
 
 
