@@ -292,3 +292,36 @@ class WorstFit(LoadStrategy):
         return ret
 
 
+class Paginacion():
+
+    def createPaginationMemory(self,memory):
+        memory.resetFreeMemory()
+        numberBlock = 0
+        for block in memory.getFreeMemory():
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

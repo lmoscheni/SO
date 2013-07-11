@@ -89,11 +89,6 @@ class InterruptionHandler():
     def requestRunningProcessOnCPU(self):
         return self.CPU.currentProcessRunning()
 
-    def requestBaseRegisterToPageTable(self,pid):
-        return self.pageTable.getRegistroBaseDe(pid)
-
-    def requestLimitRegisterToPageTable(self,pid):
-        return self.pageTable.getRegistroLimiteDe(pid)
-
+    #Retorna un nuevo proceso que se cargo en memoria y en la tabla
     def requestNewProcessFromPageTable(self,pid):
         return self.pageTable.getPCB(pid)
