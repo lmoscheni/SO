@@ -1,8 +1,9 @@
 class Block():
-    def __init__(self,registroBase,registroLimite,instrucciones):
+    def __init__(self,registroBase,registroLimite,instrucciones,pid):
         self.registroBase = registroBase
         self.registroLimite = registroLimite
         self.listaDeInstrucciones = instrucciones
+        self.pidPCB = pid
 
     #Espacio del bloque
     def spaceOnBlock(self):
@@ -23,6 +24,10 @@ class Block():
     #Setea el registro limite del bloque
     def setLimitRegister(self,register):
         self.registroLimite = register
+
+    #Retorna el pid del pcb
+    def getPID(self):
+        return self.pidPCB
 
     #Verifica si la posicion pasada como parametro es la de ese bloque
     def positionInsideBlock(self,pos):

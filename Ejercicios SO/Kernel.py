@@ -26,8 +26,10 @@ class Kernel(threading.Thread):
         try:
             self.interruptionHandler.changeToKernelMode()
             program = self.interruptionHandler.requestTheProgramDisk(program)
-            result = self.interruptionHandler.requestMemorySpaceToLoadData(program)
-            pcb = PCB(self.nextPID,result.getBaseRegister(),result.getLimitRegister())
+            self.interruptionHandler.requestMemorySpaceToLoadData(program,self.nextPID)
+            #baseRegister = self.interruptionHandler.requestBaseRegisterToPageTable(self.nextPID)
+            #limitRegister = self.interruptionHandler.requestLimitRegisterToPageTable(self.nextPID)
+            pcb = self.interruptionHandler.requestNewProcessFromPageTable(self.nextPID) #PCB(self.nextPID,baseRegister,limitRegister)
             if self.readyQueue.isEmpty() & (not self.interruptionHandler.requestRunningProcessOnCPU()): self.interruptionHandler.requestLoadProcesOnCPU(pcb)
             else: self.readyQueue.add(pcb)
             self.increaseNextPID()
@@ -44,7 +46,8 @@ class Kernel(threading.Thread):
             self.readyQueue.remove(retorno)
             self.interruptionHandler.requestLoadProcesOnCPU(retorno)
         else:
-            self.interruptionHandler.shutDownPC()
+            self.interruptionHandler.requestLoadProcesOnCPU(None)
+            #self.interruptionHandler.shutDownPC()
 
     def FIFOPolicy(self):
         self.schedulerPolicy = FIFO()

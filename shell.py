@@ -5,6 +5,7 @@ Created on 24/06/2013
 '''
 
 from user import *
+from Queue import *
 """
     Funciones empleadas para la lectura de la entrada del shell
 """
@@ -58,7 +59,7 @@ class Shell():
             if(tokens[0] == "whoIm"): self.whoIm()
             if(tokens[0] == "setAsAdmin"): self.setAsAdmin(tokens[1])
             self.runCommand(tokens[0])
-    
+
     # Nos permite iniciar sesion en el shell.
     def loggin(self,user,password):
             self.currentUser = self.userIsValid(user,password)
@@ -70,11 +71,11 @@ class Shell():
             if (u.getName() == user and u.getPassword() == password):
                 return u
         print "El usuario no existe"
-    
+
     # Permite saber quien es el usuario logueado
     def whoIm(self):
         print self.currentUser.getName()
-    
+
     # Permite anhadir un usuario a la lista de usuarios del shell
     def addUser(self,name,password):
         if(self.currentUser.isAdmin()): self.users.append(GuestUser(name,password))
@@ -96,7 +97,7 @@ class Shell():
                 new = AdministratorUser(u.getName(),u.getPassword())
                 self.users.remove(u)
                 self.users.append(new)
-                
+
     # Permite ejecutar un programa alojado en Disco
     def runCommand(self,cmd):
         self.interruptionHandler.askTheKernelToCreateProcess(cmd)

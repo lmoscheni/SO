@@ -10,11 +10,12 @@ class InterruptionHandler():
         del Sistema, y hace interactuar a los participes entre dichas
         interrupciones.
     '''
-    def __init__(self,ioSys,memory):
+    def __init__(self,ioSys,memory,pageTable):
         self.CPU = None
         self.kernel = None
         self.ioSystem = ioSys
         self.memory = memory
+        self.pageTable = pageTable
 
     # Cambia al modo Kernel
     def changeToKernelMode(self):
@@ -55,8 +56,8 @@ class InterruptionHandler():
     # El kernel pide a memoria principal, espacio para cargar a un programa,
     # de haber espacio, se pasa a la carga del programa en memoria, caso
     # contrario se levanta una excepcion
-    def requestMemorySpaceToLoadData(self,program):
-        pcb = self.memory.load(program)
+    def requestMemorySpaceToLoadData(self,program, pidPCB):
+        pcb = self.memory.load(pidPCB,program)
         return pcb
 
     # El kernel, pide al disco, que este le de un porgrama que se encuentra
@@ -87,3 +88,12 @@ class InterruptionHandler():
     #El InterruptionHandler pregunta si hay un proceso corriendo en CPU
     def requestRunningProcessOnCPU(self):
         return self.CPU.currentProcessRunning()
+
+    def requestBaseRegisterToPageTable(self,pid):
+        return self.pageTable.getRegistroBaseDe(pid)
+
+    def requestLimitRegisterToPageTable(self,pid):
+        return self.pageTable.getRegistroLimiteDe(pid)
+
+    def requestNewProcessFromPageTable(self,pid):
+        return self.pageTable.getPCB(pid)

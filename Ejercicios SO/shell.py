@@ -6,6 +6,7 @@ Created on 24/06/2013
 
 from user import *
 from Cola import *
+from ExceptionsShell import *
 
 """
     Funciones empleadas para la lectura de la entrada del shell
@@ -71,7 +72,7 @@ class Shell():
         for u in self.users:
             if (u.getName() == user and u.getPassword() == password):
                 return u
-        print "El usuario no existe"
+        raise ExceptionUserDontExist ("El usuario no existe")
 
     # Permite saber quien es el usuario logueado
     def whoIm(self):
@@ -88,7 +89,7 @@ class Shell():
             if(u == self.currentUser and u.getPassword() == oldPass):
                 u.setPassword(newPass)
             else:
-                print "el Password es incorrecto"
+                raise ExceptionErrorInOldPassword ("Password invalido")
     
     # Permite a un usuario administrador, volver usuario administrador a otro usuario
     # que no lo sea

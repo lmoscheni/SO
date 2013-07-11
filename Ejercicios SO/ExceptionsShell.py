@@ -1,4 +1,4 @@
-""" 
+"""
 	authors: Julian Skalick ; Leandro Moscheni.
 	date: ...
 	title: Shell Exceptions

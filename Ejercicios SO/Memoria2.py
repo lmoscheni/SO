@@ -4,10 +4,14 @@ from PCB import *
 from misExceptions import *
 
 class Memoria():
-    def __init__(self,tamMemory):
-        self.freeMemory = [Block(0,tamMemory,None)]
+    def __init__(self,tamMemory,pageTable):
+        self.freeMemory = [Block(0,tamMemory,None,None)]
         self.usedMemory = []
         self.loadStrategy = FirstFit()
+        self.pageTable = pageTable
+
+    def getUsedMemory(self):
+        return self.usedMemory
 
     #Setea la estrategia primer ajuste
     def setFirstFitStrategy(self):
@@ -30,9 +34,10 @@ class Memoria():
         self.usedMemory = memory
 
     #Carga las instrucciones de un programa en memoria
-    def load(self, program):
+    def load(self, pidPCB, program):
         instructions = program.getInstructions()
-        return self.loadStrategy.load(self,instructions)
+        ret = self.loadStrategy.load(self,instructions,pidPCB)
+        self.pageTable.agregarPCB(ret.getPID(),ret.getBaseRegister(),ret.getLimitRegister())
 
     #Retorna la memoria libre
     def getFreeMemory(self):
@@ -63,8 +68,30 @@ class Memoria():
         for usedBlock in  self.usedMemory:
             if usedBlock.getBaseRegister() == base:
                 self.removeUsedBlock(usedBlock)
-                newFreeBlock = Block(usedBlock.getBaseRegister(),usedBlock.getLimitRegister(),None)
+                newFreeBlock = Block(usedBlock.getBaseRegister(),usedBlock.getLimitRegister(),None,None)
                 self.addFreeBlock(newFreeBlock)
+                self.verifyConsecutiveFreeBlocks()
+
+    #Verifica si al liberar un bloque de memoria quedan dos bloques libres
+    #consecutivos, entonces lo modifica por un solo bloque
+    def verifyConsecutiveFreeBlocks(self):
+        previousBlock = None
+        for freeBlock in self.freeMemory:
+            if previousBlock == None:
+                previousBlock = freeBlock
+            else:
+                if previousBlock.getLimitRegister() + 1 == freeBlock.getBaseRegister():
+                    self.removeFreeBlock(previousBlock)
+                    freeBlock.setBaseRegister(previousBlock.getBaseRegister())
+                previousBlock = freeBlock
+
+    #Remueve el bloque libre
+    def removeFreeBlock(self,block):
+        newList = []
+        for freeBlock in self.freeMemory:
+            if freeBlock != block: newList.append(freeBlock)
+        self.setFreeMemory(newList)
+
 
     #Verifica si existe un bloque disponible
     def existAvailableBlock(self,instructions):
@@ -84,19 +111,21 @@ class Memoria():
         else: return False
 
     #Fragmenta la memoria
-    def fragmenMemory(self):
+    def fragmentMemory(self):
         self.fragmentUsedBlocks()
         self.fragmentFreeBlocks()
 
     #Fragmenta los bloques usados formando un solo bloque libre
     def fragmentFreeBlocks(self):
         memory = 0
-        limitRegisterOfLastBlockUsed = (self.usedMemory[len(self.usedMemory)-1]).getLimitRegister()
+        if len(self.usedMemory) != 0:
+            limitRegisterOfLastBlockUsed = (self.usedMemory[len(self.usedMemory)-1]).getLimitRegister()
+        else: limitRegisterOfLastBlockUsed = 0
         for freeBlock in self.freeMemory: memory = memory + freeBlock.spaceOnBlock()
         self.freeMemory = []
         baseRegister = limitRegisterOfLastBlockUsed + 1
         limitRegister = baseRegister + memory + 1
-        self.freeMemory.append(Block(baseRegister,limitRegister,None))
+        self.freeMemory.append(Block(baseRegister,limitRegister,None,None))
 
     #Fragmenta los bloques usados, moviendolos al principio de la memoria
     def fragmentUsedBlocks(self):
@@ -112,12 +141,14 @@ class Memoria():
                 usedBlock.setLimitRegister(usedBlock.getBaseRegister() + usedBlock.spaceOnBlock())
             previousBlock = usedBlock
             blockNumber+=1
+        self.pageTable.updateTable(self)
 
     #Remueve el bloque usado
     def removeUsedBlock(self,block):
         newList = []
         for usedBlock in self.usedMemory:
             if usedBlock != block: newList.append(usedBlock)
+            else: self.pageTable.removePCBFromPage(usedBlock.getPID())
         self.setUsedMemory(newList)
 
     def mostrar(self):
@@ -143,23 +174,23 @@ class LoadStrategy():
 class FirstFit(LoadStrategy):
 
     #Verifica memoria disponible y carga instrucciones en el bloque correcto
-    def load(self,memory,instructions):
+    def load(self,memory,instructions,pidPCB):
         ret = None
-        if memory.existAvailableBlock(instructions): ret = self.loadInBlock(memory,instructions)
+        if memory.existAvailableBlock(instructions): ret = self.loadInBlock(memory,instructions,pidPCB)
         else:
             if memory.existAvailableMemory(instructions):
                 memory.fragmentMemory()
-                ret = self.loadInBlock(memory,instructions)
+                ret = self.loadInBlock(memory,instructions,pidPCB)
             else: raise ExceptionNoMemory("No hay memoria")
         return ret
 
     #Carga las instrucciones en el bloque
-    def loadInBlock(self,memory,instructions):
+    def loadInBlock(self,memory,instructions,pidPCB):
         ret = None
         for freeBlock in memory.getFreeMemory():
             if freeBlock.spaceOnBlock()+1 >= len(instructions):
                 registerInstruction = len(instructions)
-                newUsedBlock = Block(freeBlock.getBaseRegister(),freeBlock.getBaseRegister() + registerInstruction-1,instructions)
+                newUsedBlock = Block(freeBlock.getBaseRegister(),freeBlock.getBaseRegister() + registerInstruction-1,instructions,pidPCB)
                 memory.addUsedBlock(newUsedBlock)
                 baseRegister = freeBlock.getBaseRegister()
                 limitRegister = freeBlock.getLimitRegister()
@@ -173,22 +204,22 @@ class FirstFit(LoadStrategy):
 class BestFit(LoadStrategy):
 
     #Verifica memoria disponible y carga instrucciones en bloque correcto
-    def load(self,memory,instructions):
+    def load(self,memory,instructions,pidPCB):
         ret = None
-        if memory.existAvailableBlock(instructions): ret = self.loadInBlock(memory,instructions)
+        if memory.existAvailableBlock(instructions): ret = self.loadInBlock(memory,instructions,pidPCB)
         else:
             if memory.existAvailableMemory(instructions):
                 memory.fragmentMemory()
-                ret = self.loadInBlock(memory,instructions)
+                ret = self.loadInBlock(memory,instructions,pidPCB)
             else: raise ExceptionNoMemory("No hay memoria")
         return ret
 
     #Carga las instrucciones en el bloque
-    def loadInBlock(self,memory,instructions):
+    def loadInBlock(self,memory,instructions,pidPCB):
         ret = None
         loadABlock = self.searchFitBlock(memory,instructions)
         registerInstruction = len(instructions)
-        newUsedBlock = Block(memory.getFreeMemory()[loadABlock].getBaseRegister(),memory.getFreeMemory()[loadABlock].getBaseRegister() + registerInstruction-1,instructions)
+        newUsedBlock = Block(memory.getFreeMemory()[loadABlock].getBaseRegister(),memory.getFreeMemory()[loadABlock].getBaseRegister() + registerInstruction-1,instructions,pidPCB)
         memory.addUsedBlock(newUsedBlock)
         baseRegister = memory.getFreeMemory()[loadABlock].getBaseRegister()
         limitRegister = memory.getFreeMemory[loadABlock].getLimitRegister()
@@ -224,13 +255,13 @@ class BestFit(LoadStrategy):
 class WorstFit(LoadStrategy):
 
     #Verifica memoria disponible y carga instrucciones en bloque correcto
-    def load(self,memory,instructions):
+    def load(self,memory,instructions,pidPCB):
         ret = None
-        if memory.existAvailableBlock(instructions): ret = self.loadInBlock(memory,instructions)
+        if memory.existAvailableBlock(instructions): ret = self.loadInBlock(memory,instructions,pidPCB)
         else:
             if memory.existAvailableMemory(instructions):
                 memory.fragmentMemory()
-                ret = self.loadInBlock(memory,instructions)
+                ret = self.loadInBlock(memory,instructions,pidPCB)
             else: raise ExceptionNoMemory("No hay memoria")
         return ret
 
@@ -247,11 +278,11 @@ class WorstFit(LoadStrategy):
         return ret
 
     #Carga las instrucciones en el bloque
-    def loadInBlock(self,memory,instructions):
+    def loadInBlock(self,memory,instructions,pidPCB):
         ret = None
         loadABlock = self.searchBigrBlock(memory,instructions)
         registerInstruction = len(instructions)
-        newUsedBlock = Block(memory.getFreeMemory()[loadABlock].getBaseRegister(),memory.getFreeMemory()[loadABlock].getBaseRegister() + registerInstruction-1,instructions)
+        newUsedBlock = Block(memory.getFreeMemory()[loadABlock].getBaseRegister(),memory.getFreeMemory()[loadABlock].getBaseRegister() + registerInstruction-1,instructions,pidPCB)
         memory.addUsedBlock(newUsedBlock)
         baseRegister = memory.getFreeMemory()[loadABlock].getBaseRegister()
         limitRegister = memory.getFreeMemory()[loadABlock].getLimitRegister()
