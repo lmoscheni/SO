@@ -21,3 +21,15 @@ class ExceptionNoProgramInDisk(Exception):
         self.valor = valor
     def __str__(self):
         return repr(self.valor)
+
+class ExceptionNoMemory(Exception):
+    def __init__(self,valor):
+        self.valor = valor
+    def __str__(self):
+        return repr(self.valor)
+
+class ExceptionNoInstructionOnMemory(Exception):
+    def __init__(self,valor):
+        self.valor = valor
+    def __str__(self):
+        return repr(self.valor)

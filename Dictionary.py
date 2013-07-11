@@ -12,19 +12,24 @@ class Dictionary():
     '''
     def __init__(self):
         self.map = []
-        
+
     def lookUp(self,key):
+        retorno = None
         for e in self.map:
-            if e.isSameKey(key): return e.getValue()
-        print "salta excepcion"
-        
-    def add(self,key,value):
+            if e.isSameKey(key):
+                retorno = e.getValue()
+                break
+        if retorno == None:
+            print "salta excepcion"
+        return retorno
+
+    def addToDictionary(self,key,value):
         element = Pair(key,value)
         self.map.append(element)
-        
+
     def remove(self,key):
         self.map.remove(self.lookUp(key))
-        
+
 
 class Pair():
     '''
@@ -33,12 +38,12 @@ class Pair():
     def __init__(self,key,value):
         self.key = key
         self.value = value
-    
+
     def getKey(self):
         return self.key
-    
+
     def getValue(self):
         return self.value
-    
-    def isSameKey(self,value):
-        return (self.value == value)
+
+    def isSameKey(self,key):
+        return (self.key == key)

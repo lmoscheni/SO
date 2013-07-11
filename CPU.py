@@ -6,6 +6,7 @@ Created on Jul 7, 2013
 import threading
 import time
 from InterruptionHandler import *
+from Memoria2 import *
 
 class CPU(threading.Thread):
     '''
@@ -13,36 +14,49 @@ class CPU(threading.Thread):
         intrucciones de calculo y logica.
     '''
     def __init__(self,quantum,intrHandler):
+        threading.Thread.__init__(self)
         self.currentProcess = None
         self.end = False
         self.clock = Clock(1)
         self.timmer = Timmer(quantum)
         self.interruptionHandler = intrHandler
-        self.run()
+        self.start()
 
     def shutDown(self):
         self.end = True
+
+    def getCurrentProcess(self):
+        return self.currentProcess
 
     def loadProcess(self,process):
         self.timmer.reset()
         self.currentProcess = process
 
+    def currentProcessRunning(self):
+        return (self.currentProcess != None)
+
+    def changeKernelMode(self):
+        self.clock.sleep()
+
     def isTimeOut(self):
         return self.timmer.isTheLimitOfCycles()
 
     def isEndProgram(self):
-        return self.currentProces.reachedTheEnd()
+        return self.currentProcess.reachedTheEnd()
 
     def runIntruction(self):
-        self.memory.get(self.currentProcess.getPC()).runInstruction()
+        position = self.currentProcess.getPC() + self.currentProcess.getInicio()
+        print self.interruptionHandler.requestInstructionForMemory(position) #.runInstruction()
         self.currentProcess.increasePC()
         self.timmer.addCylce()
 
     def run(self):
         while True:
-            self.runIntruction()
-            if self.isTimeOut(): self.interruptionHandler.notifyTheKernelOfTheContextSwitching()
-            if self.isEndProgram(): self.interruptionHandler.notifyTheKernelOfTerminationOfProcess()
+            if self.currentProcess != None:
+                self.runIntruction()
+                if self.isEndProgram(): self.interruptionHandler.notifyTheKernelOfTerminationOfProcess(self.currentProcess)
+                else:
+                    if self.isTimeOut(): self.interruptionHandler.notifyTheKernelOfContextSwitching()
             if self.end: break
 
 
@@ -57,7 +71,7 @@ class Clock():
              ^
              |
              window
-        Al ser unas señal simetrica, el tiempo de estado bajo
+        Al ser unas senal simetrica, el tiempo de estado bajo
         es igual al tiempo de estado alto, osea que la CPU
         tiene un tiempo de trabajo de "window" y un tiempo de
         descanso de "window" antes de reanudar al trabajo

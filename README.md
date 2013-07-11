@@ -8,14 +8,21 @@ se da a lugar al desarrollo de un pequeño emulador de un SO.
 
 Por ahora los modulos cargados, son los siguientes:
 
-* Shell
-* Program
-* Instructions(Gerarquia)
-* User(Gerarquia)
-* CPU(incluye Timmer y Clock)
-* InterruptionHandler
-* Scheduler
-* Kernel
-* PCB
-* Queue y Dictionary
-* HardDisk
+* Shell (Finalizado)
+* Program(Finalizado)
+* Instructions(Gerarquia) (Finalizado)
+* User(Gerarquia) (Finalizado)
+* CPU(incluye Timmer y Clock) (Finalizado)
+* InterruptionHandler (Finalizado)
+* Scheduler (Finalizad)
+* Kernel (Finalizado)
+* PCB (Finalizado)
+* Queue y Dictionary (Finalizado)
+* HardDisk (Finalizado)
+* Memory (Finalizado)
+
+Cualquier duda o consulta contactar a:
+
+leandromoscheni@gmail.com
+
+skalic.julian@gmail.com

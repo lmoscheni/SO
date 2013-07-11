@@ -1,62 +1,42 @@
-class Bloque():
-    def __init__(self,registroBase,registroLimite,instrucciones):
+class Block():
+    def __init__(self,registroBase,registroLimite,instrucciones,pid):
         self.registroBase = registroBase
         self.registroLimite = registroLimite
-        #self.proximoBloque = proximoBloque
         self.listaDeInstrucciones = instrucciones
-        #self.bloqueLibre = bloqueLibre
+        self.pidPCB = pid
 
-    def getProximoBloque(self):
-        return self.proximoBloque
-
-    def setProximoBloque(self,bloque):
-        self.proximoBloque = bloque
-
-    def esUltimoBloque(self):
-        if self.proximoBloque == None:
-            return True
-        else:
-            return False
-
-    def esBloqueLibre(self):
-        return self.bloqueLibre
-
-    def espacioEnBloque(self):
+    #Espacio del bloque
+    def spaceOnBlock(self):
         return (self.registroLimite - self.registroBase)
 
-    def getRegistroBase(self):
+    #Retorna el registro base del bloque
+    def getBaseRegister(self):
         return self.registroBase
 
-    def getRegistroLimite(self):
+    #Retorna el registro limite del bloque
+    def getLimitRegister(self):
         return self.registroLimite
 
-    def setRegistroBase(self,registro):
-        self.registroBase = registro
+    #Setea el registro base del bloque
+    def setBaseRegister(self,register):
+        self.registroBase = register
 
-    def setRegistroLimite(self,registro):
-        self.registroLimite = registro
+    #Setea el registro limite del bloque
+    def setLimitRegister(self,register):
+        self.registroLimite = register
 
-    def posicionEstaDentroDeHueco(self,pos):
-        if pos >= self.registroBase & pos <= self.registroLimite:
+    #Retorna el pid del pcb
+    def getPID(self):
+        return self.pidPCB
+
+    #Verifica si la posicion pasada como parametro es la de ese bloque
+    def positionInsideBlock(self,pos):
+        if (pos >= self.registroBase) & (pos <= self.registroLimite):
             return True
         else:
             return False
 
-    def leerInstruccion(self,pos):
-        return self.listaDeInstrucciones[self.registroBase + pos]
+    #Lee la isntruccion de la posicion
+    def readInstruction(self,pos):
+        return self.listaDeInstrucciones[pos - (self.registroBase)]
 
-    def terminoLecturaDeBloque(self,pos):
-        retorno = False
-        if pos == self.registroLimite:
-            retorno = True
-        return retorno
-
-class BloqueLibre(Bloque):
-    def __init__(self,registroBase,registroLimite,instr):
-        Bloque.__init__(self,registroBase,registroLimite,instr,True)
-
-
-
-class BloqueOcupado(Bloque):
-    def __init__(self,registroBase,registroLimite,instr,proxBloque):
-        Bloque.__init__(self,registroBase,registroLimite,instr,proxBloque,False)

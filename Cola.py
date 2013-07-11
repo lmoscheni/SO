@@ -11,15 +11,17 @@ class Queue():
     def __init__(self):
         self.index = 0
         self.queue = []
-        
+
     def add(self,element):
-        self.queue.insert(self.index, element)
+        self.queue.append(element)
         self.index = self.index + 1
-        
+
     def remove(self,element):
         self.queue.remove(element)
-        
+
     def first(self):
         return self.queue[0]
-        
-        
+
+    def isEmpty(self):
+        return (self.queue == [])
+

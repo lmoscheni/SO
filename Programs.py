@@ -1,7 +1,7 @@
 # Importing Instructions Hierarchy.
 from Instructions import*
 
-""" 
+"""
     authors: Julian Skalick ; Leandro Moscheni.
     date: ...
     title: Programs
@@ -18,6 +18,12 @@ class Program():
 
     def adInstruction(self, instr):
         self.listOfInstructions.append(instr)
+
+    def name(self):
+        return self.name
+
+    def getInstructions(self):
+        return self.listOfInstructions
 
     def runProgram(self):
         for instr in self.listOfInstructions:

@@ -5,7 +5,9 @@ Created on 24/06/2013
 '''
 
 from user import *
-from Queue import *
+from Cola import *
+from ExceptionsShell import *
+
 """
     Funciones empleadas para la lectura de la entrada del shell
 """
@@ -32,9 +34,9 @@ def generateTokens(ent):
 
 # Representacion de un Shell
 class Shell():
-    def __init__(self, password,intrHandler):
+    def __init__(self, password):
         self.users = []
-        self.interruptionHandler = intrHandler
+        self.kernel = Kernel()
         self.users.append(AdministratorUser("Root",password))
         self.currentUser = None
         self.initializePrompt()
@@ -51,14 +53,14 @@ class Shell():
         while True:
             print self.currentUser.getName() , statePrompt
             input = raw_input()
-            if(input == "exit"): break # parar threads, apagar cpu y break
+            if(input == "exit"): break
             tokens = generateTokens(input)
             if(tokens[0] == "loggin"): self.loggin(tokens[1], tokens[2])
             if(tokens[0] == "changePassword"): self.changePassword(tokens[1], tokens[2])
             if(tokens[0] == "addUser"): self.addUser(tokens[1], tokens[2])
             if(tokens[0] == "whoIm"): self.whoIm()
-            if(tokens[0] == "setAsAdmin"): self.setAsAdmin(tokens[1])
-            self.runCommand(tokens[0])
+            if(tokens[0] == "setAsAdmin") : self.setAsAdmin(tokens[1])
+            #Hay que hacer que interactue con el Kernel, para buscar el programa en Disco
 
     # Nos permite iniciar sesion en el shell.
     def loggin(self,user,password):
@@ -70,13 +72,13 @@ class Shell():
         for u in self.users:
             if (u.getName() == user and u.getPassword() == password):
                 return u
-        print "El usuario no existe"
+        raise ExceptionUserDontExist ("El usuario no existe")
 
     # Permite saber quien es el usuario logueado
     def whoIm(self):
         print self.currentUser.getName()
 
-    # Permite anhadir un usuario a la lista de usuarios del shell
+    # Permite añadir un usuario a la lista de usuarios del shell
     def addUser(self,name,password):
         if(self.currentUser.isAdmin()): self.users.append(GuestUser(name,password))
 
@@ -87,7 +89,7 @@ class Shell():
             if(u == self.currentUser and u.getPassword() == oldPass):
                 u.setPassword(newPass)
             else:
-                print "el Password es incorrecto"
+                raise ExceptionErrorInOldPassword ("Password invalido")
     
     # Permite a un usuario administrador, volver usuario administrador a otro usuario
     # que no lo sea
@@ -95,12 +97,5 @@ class Shell():
         for u in self.users:
             if (u.getName() == nameUser):
                 new = AdministratorUser(u.getName(),u.getPassword())
-                self.users.remove(u)
-                self.users.append(new)
-
-    # Permite ejecutar un programa alojado en Disco
-    def runCommand(self,cmd):
-        self.interruptionHandler.askTheKernelToCreateProcess(cmd)
-        
-    def exit(self):
-        print ""
+                this.users.remove(u)
+                this.users.append(new)
