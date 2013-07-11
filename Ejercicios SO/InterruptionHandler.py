@@ -10,9 +10,9 @@ class InterruptionHandler():
         del Sistema, y hace interactuar a los participes entre dichas
         interrupciones.
     '''
-    def __init__(self,kernel,cpu,ioSys,memory):
-        self.CPU = cpu
-        self.kernel = kernel
+    def __init__(self,ioSys,memory):
+        self.CPU = None
+        self.kernel = None
         self.ioSystem = ioSys
         self.memory = memory
 
@@ -23,13 +23,19 @@ class InterruptionHandler():
     def changeToNormalMode(self):
         print ""
 
+    def setKernel(self,kernel):
+        self.kernel = kernel
+
+    def setCPU(self,CPU):
+        self.CPU = CPU
+
     # Apaga la CPU
     def shutDownPC(self):
         self.CPU.shutDown()
 
     # Notifica al Kernel de la finalizacion de un proceso, para que lo
     # quite de la cola de Ready
-    def notifyTheKernelOfTherminationOfProcess(self,pcb):
+    def notifyTheKernelOfTerminationOfProcess(self,pcb):
         self.requestToFreeMemorySpace(pcb)
         self.kernel.deleteProcess(pcb)
         self.notifyTheKernelOfContextSwitching()
@@ -37,7 +43,7 @@ class InterruptionHandler():
     # Notifica al Kernel, de un cambio de contexto, para que este,actue
     # en consecuencia
     def notifyTheKernelOfContextSwitching(self):
-        self.CPU.loadProcess(self.kernel.nextProcess())
+        self.kernel.nextProcess()
 
     # El Shell pide al Kernel, la creacion de un proceso, referente a un
     # programa alojado en disco.
@@ -56,7 +62,7 @@ class InterruptionHandler():
     # El kernel, pide al disco, que este le de un porgrama que se encuentra
     # alojado en el, en caso de no existir, levanta una excepcion
     def requestTheProgramDisk(self,nameProgram):
-        program = self.ioSystem.getProgram(nameProgram)
+        program = self.ioSystem.search(nameProgram)
         return program
 
     # El kernel le pide a memoria, que libere el espacio, ocupado por determinado
@@ -68,3 +74,16 @@ class InterruptionHandler():
     # (position)
     def requestInstructionForMemory(self,position):
         return self.memory.read(position)
+
+    #El InterruptionHandler pide cargar al cpu un proceso para ejecutar
+    def requestLoadProcesOnCPU(self,pcb):
+        self.CPU.loadProcess(pcb)
+
+    #El InterruptionHandler pide el proceso en CPU
+    def getCurrentProcessOnCPU(self):
+        process = self.CPU.getCurrentProcess()
+        return process
+
+    #El InterruptionHandler pregunta si hay un proceso corriendo en CPU
+    def requestRunningProcessOnCPU(self):
+        return self.CPU.currentProcessRunning()
