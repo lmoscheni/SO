@@ -52,10 +52,10 @@ class Shell():
         password = raw_input()
         self.loggin(name,password)
         while True:
-            print self.currentUser.getName() , statePrompt
             if self.notification != "":
                 print self.notification
                 self.notification = ""
+            print self.currentUser.getName() , statePrompt
             input = raw_input()
             if(input == "exit"): break
             tokens = generateTokens(input)
