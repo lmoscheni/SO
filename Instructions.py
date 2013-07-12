@@ -14,18 +14,25 @@ class Instruction():
 
     def isIOInstruction(self):
         return(False)
+    
 
 # Class representing the concept of instruction that communicates 
 # with devices I/O.
 class IOInstruction(Instruction):
 
     def __init__(self, name):
-        super()
+        Instruction.__init__(self, name)
+        
+    def runInstruction(self):
+        print "Ejecuto ",self.name
 
 # Class representing the concept of instruction that takes place 
 # entirely in the CPU
 class CPUInstruction(Instruction):
     
     def __init__(self,name):
-        super()
+        Instruction.__init__(self, name)
+    
+    def runInstruction(self):
+        print "Ejecuto ",self.name
 

@@ -20,6 +20,7 @@ Por ahora los modulos cargados, son los siguientes:
 * Queue y Dictionary (Finalizado)
 * HardDisk (Finalizado)
 * Memory (Finalizado)
+* IOSystem(Finalizado y probado)
 
 Cualquier duda o consulta contactar a:
 

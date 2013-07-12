@@ -41,7 +41,7 @@ class Shell():
         self.currentUser = None
         self.notification = ""
         self.initializePrompt()
-
+    
     def initializePrompt(self):
         statePrompt = "~> "
         print "Hello"
@@ -52,10 +52,8 @@ class Shell():
         password = raw_input()
         self.loggin(name,password)
         while True:
-            if self.notification != "":
-                print self.notification
-                self.notification = ""
             print self.currentUser.getName() , statePrompt
+            if self.notification != "": print self.notification
             input = raw_input()
             if(input == "exit"): break
             tokens = generateTokens(input)
@@ -65,7 +63,7 @@ class Shell():
             if(tokens[0] == "whoIm"): self.whoIm()
             if(tokens[0] == "setAsAdmin") : self.setAsAdmin(tokens[1])
             self.runCommand(tokens[0])
-
+            
 
     # Nos permite iniciar sesion en el shell.
     def loggin(self,user,password):
@@ -83,7 +81,8 @@ class Shell():
     def whoIm(self):
         print self.currentUser.getName()
 
-    # Permite añadir un usuario a la lista de usuarios del shell    def addUser(self,name,password):
+    # Permite añadir un usuario a la lista de usuarios del shell
+    def addUser(self,name,password):
         if(self.currentUser.isAdmin()): self.users.append(GuestUser(name,password))
 
     # Permite cambiar el password actual, al usuario logueado,en caso de ingresar de
@@ -94,7 +93,7 @@ class Shell():
                 u.setPassword(newPass)
             else:
                 raise ExceptionErrorInOldPassword ("Password invalido")
-
+    
     # Permite a un usuario administrador, volver usuario administrador a otro usuario
     # que no lo sea
     def setAsAdmin(self,nameUser):
@@ -103,8 +102,8 @@ class Shell():
                 new = AdministratorUser(u.getName(),u.getPassword())
                 this.users.remove(u)
                 this.users.append(new)
-
-    # Permite ejecutar un programa alojado en disco
+    
+    # Permite ejecutar un programa alojado en disco            
     def runCommand(self,anCommand):
         self.interruptionHandler.askTheKernelToCreateProcess(anCommand)
 

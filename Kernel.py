@@ -23,7 +23,7 @@ class Kernel(threading.Thread):
         self.nextPID = 0
         
     def searchProgramInDiskAndLoadInMemory(self,nameProgram):
-        program = self.interruptionHandler.requestTheProgramDisk(program)
+        program = self.interruptionHandler.requestTheProgramDisk(nameProgram)
         self.interruptionHandler.requestMemorySpaceToLoadData(program,self.nextPID)
         pcb = self.interruptionHandler.requestNewProcessFromPageTable(self.nextPID)
         self.increaseNextPID()

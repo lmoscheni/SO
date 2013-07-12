@@ -1,6 +1,3 @@
-# Importing Instructions Hierarchy.
-from Instructions import*
-
 """
     authors: Julian Skalick ; Leandro Moscheni.
     date: ...
@@ -16,7 +13,7 @@ class Program():
         self.description = description
         self.listOfInstructions = []
 
-    def adInstruction(self, instr):
+    def addInstruction(self, instr):
         self.listOfInstructions.append(instr)
 
     def name(self):
