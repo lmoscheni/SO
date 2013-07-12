@@ -32,9 +32,9 @@ class Kernel(threading.Thread):
 
     def createProcess(self,nameProgram):
         try:
-            #self.interruptionHandler.changeToKernelMode()
             pcb = self.searchProgramInDiskAndLoadInMemory(nameProgram)
-            self.readyQueue.add(pcb)
+            self.readyQueue.add(pcb) 
+            if(self.interruptionHandler.CPU.currentProcess == None) : self.interruptionHandler.CPU.currentProcess = pcb
         except (ExceptionNoProgramInDisk,ExceptionNoMemory), e:
             self.interruptionHandler.sendShellMessage(e)
 
@@ -46,9 +46,11 @@ class Kernel(threading.Thread):
 
     def FIFOPolicy(self):
         self.schedulerPolicy = FIFO()
+        self.interruptionHandler.setQuantum(100)
 
-    def RRPolicy(self):
-        self.schedulerPolicy = RoundRobin()
+    def RRPolicy(self,q):
+        self.schedulerPolicy = RoundRobin(q)
+        self.interruptionHandler.setQuantum(self.schedulerPolicy.quantum)
 
     def PriorityPolicy(self):
         self.schedulerPolicy = Priority()

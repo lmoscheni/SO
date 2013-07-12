@@ -40,6 +40,9 @@ class PCB():
     def getPriority(self):
         return self.priority
 
+    def setPriority(self,v):
+        self.priority = v
+
     def increasePC(self):
         self.pc = self.pc + 1
 

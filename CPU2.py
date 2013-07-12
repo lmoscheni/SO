@@ -5,13 +5,15 @@ Created on Jul 7, 2013
 '''
 import threading
 import time
+from InterruptionHandler import *
+from Memoria2 import *
 
 class CPU(threading.Thread):
     '''
         Entidad fisica encargada de correr las intrucciones, y computar
         intrucciones de calculo y logica.
     '''
-    def __init__(self,quantum,):
+    def __init__(self,quantum):
         threading.Thread.__init__(self)
         self.currentProcess = None
         self.end = False
@@ -19,10 +21,9 @@ class CPU(threading.Thread):
         self.timmer = Timmer(quantum)
         self.interruptionHandler = None
         self.start()
-        #self.startUp()
-
-    def setInterruptionHandler(self,intrHandler):
-        self.interruptionHandler = intrHandler
+        
+    def setInterruptionHandler(self,ih):
+        self.interruptionHandler = ih
 
     def shutDown(self):
         self.end = True
@@ -33,10 +34,12 @@ class CPU(threading.Thread):
     def loadProcess(self,process):
         self.timmer.reset()
         self.currentProcess = process
-        if process != None: process.setState("Running")
 
     def currentProcessRunning(self):
         return (self.currentProcess != None)
+
+    def changeKernelMode(self):
+        self.clock.sleep()
 
     def isTimeOut(self):
         return self.timmer.isTheLimitOfCycles()
@@ -44,20 +47,18 @@ class CPU(threading.Thread):
     def isEndProgram(self):
         return self.currentProcess.reachedTheEnd()
 
-    def runInstructionOfProcess(self):
+    def runIntruction(self):
+        #position = self.currentProcess.getPC() + self.currentProcess.getInicio()
+        #print self.interruptionHandler.requestInstructionForMemory(position) #.runInstruction()
         instruction = self.interruptionHandler.getInstruction(self.currentProcess.getPC())
         instruction.runInstruction()
         self.currentProcess.increasePC()
         self.timmer.addCylce()
 
-    def checkStatusOfCurrentProcess(self):
-        if self.isEndProgram() :return self.interruptionHandler.notifyTheKernelOfTerminationOfProcess(self.currentProcess)
-        if self.isTimeOut() : return self.interruptionHandler.notifyTheKernelOfContextSwitching()
-
     def run(self):
         while True:
             if self.currentProcess != None:
-                self.runInstructionOfProcess()
+                self.runIntruction()
                 if self.isEndProgram(): self.interruptionHandler.notifyTheKernelOfTerminationOfProcess(self.currentProcess)
                 else:
                     if self.isTimeOut(): self.interruptionHandler.notifyTheKernelOfContextSwitching()

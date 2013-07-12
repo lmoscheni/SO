@@ -54,12 +54,13 @@ class InterruptionHandler():
     def notifyTheKernelOfContextSwitching(self):
         pcb = self.kernel.nextProcess()
         #self.changeToNormalMode()
-        self.requestLoadProcesOnCPU(pcb)
+        self.requestLoadProcessOnCPU(pcb)
         
     # El Shell pide al Kernel, la creacion de un proceso, referente a un
     # programa alojado en disco.
     def askTheKernelToCreateProcess(self,nameProgram):
         self.kernel.createProcess(nameProgram)
+        
         #self.changeToNormalMode()
 
     # El kernel pide a memoria principal, espacio para cargar a un programa,
@@ -104,14 +105,30 @@ class InterruptionHandler():
 
     # Se utiliza cuando el Kernel quiere notificar de algun suceso al usuario.
     def sendShellMessage(self,msj):
-        self.shell.showMessageInDisplay(msj)
+        self.shell.showMessageInTheDisplay(msj)
         
     # Se utiliza para pedir un proceso en caso de que no haya ninguno en CPU    
     def getNewProcess(self):
         #self.changeToKernelMode()
         pcb = self.kernel.nextProcess()
         self.requestLoadProcessOnCPU(pcb)
-        
+    
+    # Retorna la instruccion que se encuenta en la posicion "position"    
     def getInstruction(self, position):
         instruction = self.memory.read(position)
         return instruction
+    
+    # Permite al algoritmo RR cambiar un Quantum
+    def setQuantum(self,q):
+        self.CPU.timmer.changeQuantum(q)
+        
+    # Hace Seleccion FIFO sobre la cola de listos
+    def FIFOQueue(self):
+        self.kernel.FIFOPolicy()
+        
+    # Hace Seleccion RR sobre la cola de listos
+    def RRQueue(self,q):
+        self.kernel.RRPolicy(q)
+        
+    def PriorityPolicy(self):
+        self.kernel.PriorityPolicy()

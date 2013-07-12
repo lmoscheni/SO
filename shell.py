@@ -37,10 +37,12 @@ class Shell():
     def __init__(self, password,intrHandler):
         self.users = []
         self.interruptionHandler = intrHandler
+        self.interruptionHandler.setShell(self)
         self.users.append(AdministratorUser("Root",password))
         self.currentUser = None
         self.notification = ""
         self.commandAdd = False
+        self.esperaResultado = False
         self.initializePrompt()
     
     def initializePrompt(self):
@@ -53,9 +55,13 @@ class Shell():
         password = raw_input()
         self.loggin(name,password)
         while True:
-            self.interruptionHandler.CPU.startUp()
+            if(self.esperaResultado) :
+                sleep(1)
+                self.esperaResultado = False
             print self.currentUser.getName() , statePrompt
-            if self.notification != "": print self.notification
+            if self.notification != "": 
+                print self.notification
+                self.notification = ""
             input = raw_input()
             if(input == "exit"): break
             tokens = generateTokens(input)
@@ -77,11 +83,23 @@ class Shell():
             if(tokens[0] == "listOfProcess"):
                 self.listOfProcess()
                 self.commandAdd = True
-            if(tokens[0] == "process"):
+            if(tokens[0] == "thatProcessIsRunning"):
                 self.currentProcessCPU()
                 self.commandAdd = True
-            if(not self.commandAdd): self.runCommand(tokens[0])
+            if(tokens[0] == "FIFOImplements"):
+                self.FIFOImplement()
+                self.commandAdd = True
+            if(tokens[0] == "RRImplements"):
+                self.RRImplement(tokens[1])
+                self.commandAdd = True
+            if(tokens[0] == "PriorityImplements"):
+                self.PriorityImplement()
+                self.commandAdd = True
+            if(not self.commandAdd): 
+                self.runCommand(tokens[0])
+                self.esperaResultado = True
             self.commandAdd = False
+            
             
 
     # Nos permite iniciar sesion en el shell.
@@ -134,5 +152,15 @@ class Shell():
         for p in self.interruptionHandler.kernel.readyQueue.queue:
             print p.getPID(), p.getState(),p.getInicio(),p.getFin()
             
-    def currentProcessCPU(self):
+    def thatProcessIsRunning(self):
         print self.interruptionHandler.CPU.currentProcess
+        
+    def FIFOImplement(self):
+        self.interruptionHandler.FIFOQueue()
+        
+    def RRImplement(self,q):
+        self.interruptionHandler.RRQueue(q)
+    
+    def PriorityImplement(self):
+        self.interruptionHandler.PriorityQueue()
+        

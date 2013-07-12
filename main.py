@@ -28,10 +28,18 @@ if __name__ == '__main__':
     i3 = CPUInstruction("Main()")
     program2.addInstruction(i3)
 
+    # Definimos el programa 3
+    program3 = Program("largo","Es Largo")
+    for n in range(1,30):
+        i = CPUInstruction("intr")
+        program3.addInstruction(i)
+  
+
     # Definimos un Disco
     hdd = HardDisk()
     hdd.save(program1)
     hdd.save(program2)
+    hdd.save(program3)
 
     # Definimos el Sistema de I/O
     iosys = IOSystem()
@@ -45,7 +53,7 @@ if __name__ == '__main__':
 
     # Definimos la Memoria
     pageTable = PageTable()
-    memory = Memoria(5,pageTable)
+    memory = Memoria(300,pageTable)
 
     # Definimos el Manejador de Interrupciones
     IH = InterruptionHandler(iosys,memory,pageTable,kernel1point0,cpu)
@@ -53,7 +61,6 @@ if __name__ == '__main__':
     # Seteamos el IH en todos los modulos que haga falta
     cpu.setInterruptionHandler(IH)
     kernel1point0.setInterruptionHandler(IH)
-    kernel1point0.RRPolicy()
 
     # creamos el shell
     shell = Shell("123",IH)

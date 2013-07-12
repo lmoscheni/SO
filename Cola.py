@@ -27,4 +27,3 @@ class Queue():
 
     def isEmpty(self):
         return (self.queue == [])
-

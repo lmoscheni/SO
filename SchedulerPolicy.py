@@ -9,6 +9,9 @@ class SchedulerPolicy():
        Entidad encargada de implementar las diferentes
        Politicas de Planificacion a corto plazo
     '''
+    def __init__(self):
+        self.quantum = None
+        
         
 class FIFO(SchedulerPolicy):
     '''
@@ -32,6 +35,10 @@ class RoundRobin(SchedulerPolicy):
         algoritmo lo que haremos, es que antes luego de retornar
         el proceso, lo pondremos al final de la cola
     '''
+    
+    def __init__(self,q):
+        SchedulerPolicy.__init__(self)
+        self.quantum = q 
     
     def getProcess(self,queue):
         process = queue.first()
