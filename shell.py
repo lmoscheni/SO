@@ -7,7 +7,7 @@ Created on 24/06/2013
 from user import *
 from Cola import *
 from ExceptionsShell import *
-
+from time import *
 """
     Funciones empleadas para la lectura de la entrada del shell
 """
@@ -53,6 +53,7 @@ class Shell():
         password = raw_input()
         self.loggin(name,password)
         while True:
+            self.interruptionHandler.CPU.startUp()
             print self.currentUser.getName() , statePrompt
             if self.notification != "": print self.notification
             input = raw_input()
@@ -75,6 +76,9 @@ class Shell():
                 self.commandAdd = True
             if(tokens[0] == "listOfProcess"):
                 self.listOfProcess()
+                self.commandAdd = True
+            if(tokens[0] == "process"):
+                self.currentProcessCPU()
                 self.commandAdd = True
             if(not self.commandAdd): self.runCommand(tokens[0])
             self.commandAdd = False
@@ -129,3 +133,6 @@ class Shell():
     def listOfProcess(self):
         for p in self.interruptionHandler.kernel.readyQueue.queue:
             print p.getPID(), p.getState(),p.getInicio(),p.getFin()
+            
+    def currentProcessCPU(self):
+        print self.interruptionHandler.CPU.currentProcess

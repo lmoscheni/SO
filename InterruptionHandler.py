@@ -86,7 +86,7 @@ class InterruptionHandler():
         return self.memory.read(position)
 
     #El InterruptionHandler pide cargar al cpu un proceso para ejecutar
-    def requestLoadProcesOnCPU(self,pcb):
+    def requestLoadProcessOnCPU(self,pcb):
         self.CPU.loadProcess(pcb)
 
     #El InterruptionHandler pide el proceso en CPU
@@ -107,10 +107,10 @@ class InterruptionHandler():
         self.shell.showMessageInDisplay(msj)
         
     # Se utiliza para pedir un proceso en caso de que no haya ninguno en CPU    
-    def getProcess(self):
+    def getNewProcess(self):
         #self.changeToKernelMode()
         pcb = self.kernel.nextProcess()
-        self.requestLoadProcesOnCPU(pcb)
+        self.requestLoadProcessOnCPU(pcb)
         
     def getInstruction(self, position):
         instruction = self.memory.read(position)
