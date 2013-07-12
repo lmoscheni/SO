@@ -5,22 +5,23 @@ Created on Jul 7, 2013
 '''
 import threading
 import time
-from InterruptionHandler import *
-from Memoria2 import *
 
 class CPU(threading.Thread):
     '''
         Entidad fisica encargada de correr las intrucciones, y computar
         intrucciones de calculo y logica.
     '''
-    def __init__(self,quantum,intrHandler):
+    def __init__(self,quantum):
         threading.Thread.__init__(self)
         self.currentProcess = None
         self.end = False
         self.clock = Clock(1)
         self.timmer = Timmer(quantum)
+        self.interruptionHandler = None
+        #self.run()
+
+    def setInterruptionHandler(self,intrHandler):
         self.interruptionHandler = intrHandler
-        self.start()
 
     def shutDown(self):
         self.end = True
@@ -36,18 +37,15 @@ class CPU(threading.Thread):
     def currentProcessRunning(self):
         return (self.currentProcess != None)
 
-    def changeKernelMode(self):
-        self.clock.sleep()
-
     def isTimeOut(self):
         return self.timmer.isTheLimitOfCycles()
 
     def isEndProgram(self):
         return self.currentProcess.reachedTheEnd()
 
-    def runIntruction(self):
-        position = self.currentProcess.getPC() + self.currentProcess.getInicio()
-        print self.interruptionHandler.requestInstructionForMemory(position) #.runInstruction()
+    def runIntructionOfProcess(self):
+        instruction = self.interruptionHandler.getInstruction(self.currentProcess.getPC())
+        instruction.runInstruction()
         self.currentProcess.increasePC()
         self.timmer.addCylce()
 
@@ -58,8 +56,8 @@ class CPU(threading.Thread):
     def run(self):
         while True:
             if self.currentProcess != None:
-                self.runIntruction()
-                self.checkStatusOfCurrentProcess()
+                self.runIntructionOfProcess()
+                lambda x: self.checkStatusOfCurrentProcess()
             else:
                 self.interruptionHandler.getProcess()
             if self.end: break

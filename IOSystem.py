@@ -5,8 +5,6 @@ Created on Jul 11, 2013
 '''
 import types
 from HardDisk import *
-from Programs import *
-from Instructions import *
 
 class IOSystem():
 

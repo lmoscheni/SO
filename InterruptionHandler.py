@@ -10,13 +10,16 @@ class InterruptionHandler():
         del Sistema, y hace interactuar a los participes entre dichas
         interrupciones.
     '''
-    def __init__(self,ioSys,memory,pageTable,shell):
-        self.CPU = None
-        self.kernel = None
+    def __init__(self,ioSys,memory,pageTable,kernel,cpu):
+        self.CPU = cpu
+        self.kernel = kernel
         self.ioSystem = ioSys
         self.memory = memory
         self.pageTable = pageTable
-        self.shell = shell
+        self.shell = None
+        
+    def setShell(self,anShell):
+        self.shell = anShell
 
     # Cambia al modo Kernel
     def changeToKernelMode(self):
@@ -42,7 +45,7 @@ class InterruptionHandler():
     # quite de la cola de Ready
     def notifyTheKernelOfTerminationOfProcess(self,pcb):
         self.requestToFreeMemorySpace(pcb)
-        self.changeToKernelMode()
+        #self.changeToKernelMode()
         self.kernel.deleteProcess(pcb)
         self.notifyTheKernelOfContextSwitching()
 
@@ -50,14 +53,14 @@ class InterruptionHandler():
     # en consecuencia
     def notifyTheKernelOfContextSwitching(self):
         pcb = self.kernel.nextProcess()
-        self.changeToNormalMode()
+        #self.changeToNormalMode()
         self.requestLoadProcesOnCPU(pcb)
         
     # El Shell pide al Kernel, la creacion de un proceso, referente a un
     # programa alojado en disco.
     def askTheKernelToCreateProcess(self,nameProgram):
         self.kernel.createProcess(nameProgram)
-        self.changeToNormalMode()
+        #self.changeToNormalMode()
 
     # El kernel pide a memoria principal, espacio para cargar a un programa,
     # de haber espacio, se pasa a la carga del programa en memoria, caso
@@ -69,7 +72,7 @@ class InterruptionHandler():
     # El kernel, pide al disco, que este le de un porgrama que se encuentra
     # alojado en el, en caso de no existir, levanta una excepcion
     def requestTheProgramDisk(self,nameProgram):
-        program = self.ioSystem.search(nameProgram)
+        program = self.ioSystem.getProgram(nameProgram)
         return program
 
     # El kernel le pide a memoria, que libere el espacio, ocupado por determinado
@@ -105,6 +108,10 @@ class InterruptionHandler():
         
     # Se utiliza para pedir un proceso en caso de que no haya ninguno en CPU    
     def getProcess(self):
-        self.changeToKernelMode()
+        #self.changeToKernelMode()
         pcb = self.kernel.nextProcess()
         self.requestLoadProcesOnCPU(pcb)
+        
+    def getInstruction(self, position):
+        instruction = self.memory.read(position)
+        return instruction

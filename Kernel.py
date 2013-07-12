@@ -6,9 +6,7 @@ Created on Jul 7, 2013
 import threading
 from Cola import *
 from SchedulerPolicy import *
-from Bloque import *
 from misExceptions import *
-from PCB import *
 
 class Kernel(threading.Thread):
     '''
@@ -16,11 +14,14 @@ class Kernel(threading.Thread):
         Es la entidad encargada de crear procesos, e interactuar
         con el hardware.
     '''
-    def __init__(self,intrHandler):
-        self.interruptionHandler = intrHandler
+    def __init__(self):
+        self.interruptionHandler = None
         self.schedulerPolicy = FIFO()
         self.readyQueue = Queue()
         self.nextPID = 0
+      
+    def setInterruptionHandler(self,intrHandler):
+        self.interruptionHandler = intrHandler
         
     def searchProgramInDiskAndLoadInMemory(self,nameProgram):
         program = self.interruptionHandler.requestTheProgramDisk(nameProgram)
@@ -31,7 +32,7 @@ class Kernel(threading.Thread):
 
     def createProcess(self,nameProgram):
         try:
-            self.interruptionHandler.changeToKernelMode()
+            #self.interruptionHandler.changeToKernelMode()
             pcb = self.searchProgramInDiskAndLoadInMemory(nameProgram)
             self.readyQueue.add(pcb)
         except (ExceptionNoProgramInDisk,ExceptionNoMemory), e:

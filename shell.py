@@ -40,6 +40,7 @@ class Shell():
         self.users.append(AdministratorUser("Root",password))
         self.currentUser = None
         self.notification = ""
+        self.commandAdd = False
         self.initializePrompt()
     
     def initializePrompt(self):
@@ -57,12 +58,26 @@ class Shell():
             input = raw_input()
             if(input == "exit"): break
             tokens = generateTokens(input)
-            if(tokens[0] == "loggin"): self.loggin(tokens[1], tokens[2])
-            if(tokens[0] == "changePassword"): self.changePassword(tokens[1], tokens[2])
-            if(tokens[0] == "addUser"): self.addUser(tokens[1], tokens[2])
-            if(tokens[0] == "whoIm"): self.whoIm()
-            if(tokens[0] == "setAsAdmin") : self.setAsAdmin(tokens[1])
-            self.runCommand(tokens[0])
+            if(tokens[0] == "loggin"): 
+                self.loggin(tokens[1], tokens[2])
+                self.commandAdd = True
+            if(tokens[0] == "changePassword"): 
+                self.changePassword(tokens[1], tokens[2])
+                self.commandAdd = True
+            if(tokens[0] == "addUser"): 
+                self.addUser(tokens[1], tokens[2])
+                self.commandAdd = True
+            if(tokens[0] == "whoIm"): 
+                self.whoIm()
+                self.commandAdd = True
+            if(tokens[0] == "setAsAdmin"): 
+                self.setAsAdmin(tokens[1])
+                self.commandAdd = True
+            if(tokens[0] == "listOfProcess"):
+                self.listOfProcess()
+                self.commandAdd = True
+            if(not self.commandAdd): self.runCommand(tokens[0])
+            self.commandAdd = False
             
 
     # Nos permite iniciar sesion en el shell.
@@ -81,7 +96,7 @@ class Shell():
     def whoIm(self):
         print self.currentUser.getName()
 
-    # Permite añadir un usuario a la lista de usuarios del shell
+    # Permite aniadir un usuario a la lista de usuarios del shell
     def addUser(self,name,password):
         if(self.currentUser.isAdmin()): self.users.append(GuestUser(name,password))
 
@@ -100,8 +115,8 @@ class Shell():
         for u in self.users:
             if (u.getName() == nameUser):
                 new = AdministratorUser(u.getName(),u.getPassword())
-                this.users.remove(u)
-                this.users.append(new)
+                self.users.remove(u)
+                self.users.append(new)
     
     # Permite ejecutar un programa alojado en disco            
     def runCommand(self,anCommand):
@@ -110,3 +125,7 @@ class Shell():
     # Permite mostrar texto en la consola, basicamente para notificacione de errores, etc
     def showMessageInTheDisplay(self,msj):
         self.notification = msj
+        
+    def listOfProcess(self):
+        for p in self.interruptionHandler.kernel.readyQueue.queue:
+            print p.getPID(), p.getState(),p.getInicio(),p.getFin()
