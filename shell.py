@@ -5,106 +5,49 @@ Created on 24/06/2013
 '''
 
 from user import *
-from Cola import *
-from ExceptionsShell import *
-from time import *
-"""
-    Funciones empleadas para la lectura de la entrada del shell
-"""
-# Dado un String, retorna la longitud del mismo
-def size(cadena):
-    ret = 0
-    for i in cadena:
-        ret = ret + 1
-    return ret
-
-# Funcion que permite la separacion en tokens de la entrada por teclado
-def generateTokens(ent):
-        y = ""
-        lista = []
-        val = size(ent)
-        for x in (ent + " "):
-            if((x != ' ') & (val != 0)):
-                y = y + x
-            else:
-                lista.append(y)
-                y = ""
-            val = val-1
-        return lista
 
 # Representacion de un Shell
 class Shell():
     def __init__(self, password,intrHandler):
         self.users = []
+        self.programs ={"loggin" : self.loggin,
+                        "whoIam" : self.whoIam,
+                        "addUser" : self.addUser,
+                        "changePassword" : self.changePassword,
+                        "setAsAdmin" : self.setAsAdmin,
+                        "ps" : self.ps,
+                        "thatProcessIsRunning" : self.thatProcessIsRunning,
+                        "FIFOImplement" : self.FIFOImplement,
+                        "RRImplement" : self.RRImplement,
+                        "PriorityImplement" : self.PriorityImplement,
+                        "exit" : self.exit
+                        }
         self.interruptionHandler = intrHandler
         self.interruptionHandler.setShell(self)
         self.users.append(AdministratorUser("Root",password))
         self.currentUser = None
-        self.notification = ""
-        self.commandAdd = False
-        self.esperaResultado = False
+        self.isRun = True
         self.initializePrompt()
     
     def initializePrompt(self):
-        statePrompt = "~> "
-        print "Hello"
-        print "Now log in with a user"
-        print "Enter the user name"
-        name = raw_input()
-        print "Enter the user password"
-        password = raw_input()
-        self.loggin(name,password)
-        while True:
-            if(self.esperaResultado) :
-                sleep(1)
-                self.esperaResultado = False
-            print self.currentUser.getName() , statePrompt
-            if self.notification != "": 
-                print self.notification
-                self.notification = ""
-            input = raw_input()
-            if(input == "exit"): break
-            tokens = generateTokens(input)
-            if(tokens[0] == "loggin"): 
-                self.loggin(tokens[1], tokens[2])
-                self.commandAdd = True
-            if(tokens[0] == "changePassword"): 
-                self.changePassword(tokens[1], tokens[2])
-                self.commandAdd = True
-            if(tokens[0] == "addUser"): 
-                self.addUser(tokens[1], tokens[2])
-                self.commandAdd = True
-            if(tokens[0] == "whoIm"): 
-                self.whoIm()
-                self.commandAdd = True
-            if(tokens[0] == "setAsAdmin"): 
-                self.setAsAdmin(tokens[1])
-                self.commandAdd = True
-            if(tokens[0] == "listOfProcess"):
-                self.listOfProcess()
-                self.commandAdd = True
-            if(tokens[0] == "thatProcessIsRunning"):
-                self.currentProcessCPU()
-                self.commandAdd = True
-            if(tokens[0] == "FIFOImplements"):
-                self.FIFOImplement()
-                self.commandAdd = True
-            if(tokens[0] == "RRImplements"):
-                self.RRImplement(tokens[1])
-                self.commandAdd = True
-            if(tokens[0] == "PriorityImplements"):
-                self.PriorityImplement()
-                self.commandAdd = True
-            if(not self.commandAdd): 
-                self.runCommand(tokens[0])
-                self.esperaResultado = True
-            self.commandAdd = False
-            
-            
+        presentation = open("./presentacion",'r')
+        print(presentation.read())
+        presentation.close()
+        statePrompt = " ~> "
+        self.loggin()
+        while self.isRun:
+            input = raw_input(self.currentUser.getName() + statePrompt)
+            try:
+                p = self.programs[input]
+                p()
+            except:
+                self.runCommand(input)
 
     # Nos permite iniciar sesion en el shell.
-    def loggin(self,user,password):
-            self.currentUser = self.userIsValid(user,password)
+    def loggin(self):
+        name = raw_input("Enter user name \n")
+        password = raw_input("Enter a user password \n")
+        self.currentUser = self.userIsValid(name,password)
 
     # Retorna el usuario asociado a (user,password) en caso de que exista,caso contrario
     # se lanza una excepcion
@@ -112,24 +55,28 @@ class Shell():
         for u in self.users:
             if (u.getName() == user and u.getPassword() == password):
                 return u
-        raise ExceptionUserDontExist ("El usuario no existe")
+        raise Exception("El usuario no existe")
 
     # Permite saber quien es el usuario logueado
-    def whoIm(self):
+    def whoIam(self):
         print self.currentUser.getName()
 
     # Permite aniadir un usuario a la lista de usuarios del shell
-    def addUser(self,name,password):
+    def addUser(self):
+        name = raw_input("Enter new user name \n")
+        password = raw_input("Enter a password for new user \n")
         if(self.currentUser.isAdmin()): self.users.append(GuestUser(name,password))
 
     # Permite cambiar el password actual, al usuario logueado,en caso de ingresar de
     # forma incorrecta el password actual se lanzara una excepcion indicando el error
-    def changePassword(self,oldPass, newPass):
+    def changePassword(self):
+        oldPass = raw_input("Enter actuall password")
+        newPass = raw_input("Enter a new password")
         for u in self.users:
             if(u == self.currentUser and u.getPassword() == oldPass):
                 u.setPassword(newPass)
             else:
-                raise ExceptionErrorInOldPassword ("Password invalido")
+                raise Exception("Password invalido")
     
     # Permite a un usuario administrador, volver usuario administrador a otro usuario
     # que no lo sea
@@ -147,20 +94,32 @@ class Shell():
     # Permite mostrar texto en la consola, basicamente para notificacione de errores, etc
     def showMessageInTheDisplay(self,msj):
         self.notification = msj
-        
-    def listOfProcess(self):
+     
+    # Lista en pantalla los procesos que estan en la cola de readt   
+    def ps(self):
+        print "PID","  State"
         for p in self.interruptionHandler.kernel.readyQueue.queue:
-            print p.getPID(), p.getState(),p.getInicio(),p.getFin()
-            
+            print p.getPID(),"   " + p.getState()
+      
+    # Retorna el proceso que actualmente esta corriendo la cpu      
     def thatProcessIsRunning(self):
-        print self.interruptionHandler.CPU.currentProcess
-        
+        print self.interruptionHandler.returnCurrentProcess()
+    
+    # Estableze el algoritmo FIFO en la cola de ready    
     def FIFOImplement(self):
         self.interruptionHandler.FIFOQueue()
         
-    def RRImplement(self,q):
+    # Establece el algoritmo RR en la cola de ready
+    def RRImplement(self):
+        q = raw_input("Enter a Quantum \n")
         self.interruptionHandler.RRQueue(q)
     
+    # Establece el algoritmo por prioridad en la cola de readt
     def PriorityImplement(self):
         self.interruptionHandler.PriorityQueue()
         
+    def exit(self):
+        logs = open("./logsDeEjecucion",'w')
+        logs.write("")
+        logs.close()
+        self.isRun = False

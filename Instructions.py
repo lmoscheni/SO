@@ -1,8 +1,10 @@
 """ 
     authors: Julian Skalick ; Leandro Moscheni.
     date: ...
-    title: Shell Exceptions
+    title: Instructions
 """
+import time
+
 # Class representing the concept of low-level instruction.
 class Instruction():
 
@@ -24,7 +26,9 @@ class IOInstruction(Instruction):
         Instruction.__init__(self, name)
         
     def runInstruction(self):
-        print "Ejecuto ",self.name
+        file = open("./logsDeEjecucion",'a')
+        file.write("ejecucion de " + self.name + "\n")
+        file.close()
 
 # Class representing the concept of instruction that takes place 
 # entirely in the CPU
@@ -34,5 +38,7 @@ class CPUInstruction(Instruction):
         Instruction.__init__(self, name)
     
     def runInstruction(self):
-        print "Ejecuto ",self.name
+        file = open("./logsDeEjecucion",'a')
+        file.write("ejecucion de " + self.name + "\n")
+        file.close()
 

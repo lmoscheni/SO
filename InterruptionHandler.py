@@ -23,13 +23,11 @@ class InterruptionHandler():
 
     # Cambia al modo Kernel
     def changeToKernelMode(self):
-        self.kernel.run()
-        self.CPU.wait()
+        self.CPU.lock()
 
     # Cambia al modo Normal de ejecucion
     def changeToNormalMode(self):
-        self.kernel.wait()
-        self.CPU.run()
+        self.CPU.release()
 
     def setKernel(self,kernel):
         self.kernel = kernel
@@ -43,9 +41,9 @@ class InterruptionHandler():
 
     # Notifica al Kernel de la finalizacion de un proceso, para que lo
     # quite de la cola de Ready
-    def notifyTheKernelOfTerminationOfProcess(self,pcb):
+    def notifyTheKernelOfTerminationOfProcess(self):
+        pcb = self.CPU.getCurrentProcess()
         self.requestToFreeMemorySpace(pcb)
-        #self.changeToKernelMode()
         self.kernel.deleteProcess(pcb)
         self.notifyTheKernelOfContextSwitching()
 
@@ -53,7 +51,6 @@ class InterruptionHandler():
     # en consecuencia
     def notifyTheKernelOfContextSwitching(self):
         pcb = self.kernel.nextProcess()
-        #self.changeToNormalMode()
         self.requestLoadProcessOnCPU(pcb)
         
     # El Shell pide al Kernel, la creacion de un proceso, referente a un
@@ -61,8 +58,6 @@ class InterruptionHandler():
     def askTheKernelToCreateProcess(self,nameProgram):
         self.kernel.createProcess(nameProgram)
         
-        #self.changeToNormalMode()
-
     # El kernel pide a memoria principal, espacio para cargar a un programa,
     # de haber espacio, se pasa a la carga del programa en memoria, caso
     # contrario se levanta una excepcion
@@ -109,10 +104,9 @@ class InterruptionHandler():
         
     # Se utiliza para pedir un proceso en caso de que no haya ninguno en CPU    
     def getNewProcess(self):
-        #self.changeToKernelMode()
         pcb = self.kernel.nextProcess()
         self.requestLoadProcessOnCPU(pcb)
-    
+        
     # Retorna la instruccion que se encuenta en la posicion "position"    
     def getInstruction(self, position):
         instruction = self.memory.read(position)
@@ -132,3 +126,7 @@ class InterruptionHandler():
         
     def PriorityPolicy(self):
         self.kernel.PriorityPolicy()
+        
+    def returnCurrentProcess(self):
+        p = self.CPU.currentProcess
+        return p

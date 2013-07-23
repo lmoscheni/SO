@@ -1,7 +1,7 @@
 '''
 Created on Jul 12, 2013
 
-@author: leandro
+@author: Leandro Moscheni ; Julian Skalic
 '''
 from CPU import *
 from HardDisk import *
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     # Definimos el programa 3
     program3 = Program("largo","Es Largo")
-    for n in range(1,30):
+    for n in range(1,21):
         i = CPUInstruction("intr")
         program3.addInstruction(i)
   
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     iosys.addDevice(hdd)
 
     # Definimos la CPU con un quantum de 3
-    cpu = CPU(3)
+    cpu = CPU()
 
     # Definimos el Kernel
     kernel1point0 = Kernel()
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     # Seteamos el IH en todos los modulos que haga falta
     cpu.setInterruptionHandler(IH)
     kernel1point0.setInterruptionHandler(IH)
-
+    
     # creamos el shell
     shell = Shell("123",IH)

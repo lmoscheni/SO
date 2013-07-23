@@ -47,4 +47,4 @@ class PCB():
         self.pc = self.pc + 1
 
     def reachedTheEnd(self):
-        return ((self.pc+self.inicio) > self.fin)
+        return ((self.pc+self.inicio) == self.fin + 1)

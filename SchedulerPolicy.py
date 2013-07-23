@@ -10,7 +10,7 @@ class SchedulerPolicy():
        Politicas de Planificacion a corto plazo
     '''
     def __init__(self):
-        self.quantum = None
+        x = "nada"
         
         
 class FIFO(SchedulerPolicy):
@@ -42,8 +42,9 @@ class RoundRobin(SchedulerPolicy):
     
     def getProcess(self,queue):
         process = queue.first()
-        queue.dequeue()
+        queue.remove(process)
         queue.add(process)
+        return process
         
 class Priority(SchedulerPolicy):
     '''

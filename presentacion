@@ -1,0 +1,14 @@
+########################################################################
+#                       Welcome to SkaMos OS 1.0                       #
+# ____________________________________________________________________ #
+# put help if you need to know what commands are available             #
+# ____________________________________________________________________ #
+# Credits:                                                             #
+# SkaMos in version 1.0 is the final stage of an OS emulator developed #
+# for the chair of SO. In this version some bugs were fixed, was       #
+# completed to handle the concurrency of the system, and used logs to  #
+# know the processes run by the CPU.                                   #
+# Any questions or suggestions feel free to visit:                     #
+#leandromoscheni [at] gmail.com                                        #
+#skalic.julian [at] gmail.com                                          #
+########################################################################
