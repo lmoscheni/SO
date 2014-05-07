@@ -6,20 +6,18 @@ Created on Jul 7, 2013
 import threading
 import time
 
-class CPU(threading.Thread):
+class CPU():
     '''
         Entidad fisica encargada de correr las intrucciones, y computar
         intrucciones de calculo y logica.
     '''
     def __init__(self):
-        threading.Thread.__init__(self)
         self.currentProcess = None
         self.end = False
         self.clock = Clock(3)
         self.timmer = Timmer(1)
         self.interruptionHandler = None
-        self.start()
-
+        
     def setInterruptionHandler(self,intrHandler):
         self.interruptionHandler = intrHandler
 

@@ -10,14 +10,13 @@ class HardDisk():
         Representacion de un Disco Rigido, o Almacenamiento Secuendario
     '''
     def __init__(self):
-        self.space = Dictionary()
+        self.space = {}
 
     def search(self,nameProgram):
-        return self.space.lookUp(nameProgram)
+        return self.space[nameProgram]
 
     def save(self,program):
-        programName = program.name
-        self.space.addToDictionary(programName, program)
+        self.space[program.name()] = program
 
     def delete(self,nameProgram):
         self.space.remove(nameProgram)

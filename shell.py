@@ -26,14 +26,15 @@ class Shell():
         self.interruptionHandler.setShell(self)
         self.users.append(AdministratorUser("Root",password))
         self.currentUser = None
+        self.isRun = False
+
+    def startUp(self):
         self.isRun = True
-        self.initializePrompt()
-    
-    def initializePrompt(self):
+        self.FIFOImplement()
         presentation = open("./presentacion",'r')
         print(presentation.read())
         presentation.close()
-        statePrompt = " ~> "
+        statePrompt = " >> "
         self.loggin()
         while self.isRun:
             input = raw_input(self.currentUser.getName() + statePrompt)
@@ -70,7 +71,7 @@ class Shell():
     # Permite cambiar el password actual, al usuario logueado,en caso de ingresar de
     # forma incorrecta el password actual se lanzara una excepcion indicando el error
     def changePassword(self):
-        oldPass = raw_input("Enter actuall password")
+        oldPass = raw_input("Enter actual password")
         newPass = raw_input("Enter a new password")
         for u in self.users:
             if(u == self.currentUser and u.getPassword() == oldPass):
@@ -80,26 +81,22 @@ class Shell():
     
     # Permite a un usuario administrador, volver usuario administrador a otro usuario
     # que no lo sea
-    def setAsAdmin(self,nameUser):
+    def setAsAdmin(self,anUser):
         for u in self.users:
-            if (u.getName() == nameUser):
-                new = AdministratorUser(u.getName(),u.getPassword())
-                self.users.remove(u)
-                self.users.append(new)
+            if (u == anUser):
+                u.setAsAdmin()
     
     # Permite ejecutar un programa alojado en disco            
     def runCommand(self,anCommand):
         self.interruptionHandler.askTheKernelToCreateProcess(anCommand)
 
-    # Permite mostrar texto en la consola, basicamente para notificacione de errores, etc
-    def showMessageInTheDisplay(self,msj):
-        self.notification = msj
      
     # Lista en pantalla los procesos que estan en la cola de readt   
     def ps(self):
-        print "PID","  State"
+        print "  PID","  State  "
+        print "______________"
         for p in self.interruptionHandler.kernel.readyQueue.queue:
-            print p.getPID(),"   " + p.getState()
+            print p.getPID()," | " + p.getState()
       
     # Retorna el proceso que actualmente esta corriendo la cpu      
     def thatProcessIsRunning(self):
@@ -120,6 +117,6 @@ class Shell():
         
     def exit(self):
         logs = open("./logsDeEjecucion",'w')
-        logs.write("")
+        logs.write("\n")
         logs.close()
         self.isRun = False

@@ -25,19 +25,12 @@ class InterruptionHandler():
     def changeToKernelMode(self):
         self.CPU.lock()
 
-    # Cambia al modo Normal de ejecucion
-    def changeToNormalMode(self):
-        self.CPU.release()
-
     def setKernel(self,kernel):
         self.kernel = kernel
 
     def setCPU(self,CPU):
         self.CPU = CPU
 
-    # Apaga la CPU
-    def shutDownPC(self):
-        self.CPU.shutDown()
 
     # Notifica al Kernel de la finalizacion de un proceso, para que lo
     # quite de la cola de Ready

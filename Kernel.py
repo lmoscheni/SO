@@ -8,7 +8,7 @@ from Cola import *
 from SchedulerPolicy import *
 from misExceptions import *
 
-class Kernel(threading.Thread):
+class Kernel():
     '''
         Representacion del Kernel de un sistema operativo.
         Es la entidad encargada de crear procesos, e interactuar
@@ -37,7 +37,7 @@ class Kernel(threading.Thread):
             self.readyQueue.add(pcb) 
             if(self.interruptionHandler.CPU.currentProcess == None) : self.interruptionHandler.CPU.currentProcess = pcb
         except (ExceptionNoProgramInDisk,ExceptionNoMemory), e:
-            self.interruptionHandler.sendShellMessage(e)
+            print e
 
     def increaseNextPID(self):
         self.nextPID = self.nextPID + 1
